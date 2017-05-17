@@ -1,4 +1,4 @@
-"""Bot exemple qui répond à @greut."""
+"""Connexion au bot Discord"""
 
 import asyncio
 import json
@@ -76,7 +76,7 @@ async def start(ws):
                     last_sequence = data['s']
                     if data['t'] == "MESSAGE_CREATE":
                         print(data['d'])
-                        if data['d']['author']['username'] == 'greut':
+                        if data['d']['author']['username'] == 'Axel Rieben':
                             task = asyncio.ensure_future(send_message(data['d']['author']['id'],
                                                                       data['d']['content']))
 

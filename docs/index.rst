@@ -19,3 +19,46 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+===================
+How to use the bot
+===================
+
+Example of conversation :
+-------------------------
+**Get some help**
+User : help
+Bot : new | delete | search | today | week | month
+      link documentation
+
+**Add a new event to the calendar**
+User : new
+Bot : event title ?
+User : test de Python
+Bot : event description ?
+User : all of the subject
+Bot : data ? (format dd.mm.yyyy)
+User : 23.04.2017
+Bot : New event add_.
+.. _New event add: #
+
+**Get list event**
+User : today
+Bot : today - calendar
+      test de python : all of the subject
+
+
+User : week */same with the command month/*
+Bot : week - calendar
+      Monday 23 mai 2017
+         -> test de python : all of the subject
+
+      Wednesday 25 mai 2017
+         -> labo 6  : Assignment
+
+
+**Use search**
+User : search "labo"
+bot : search - ["labo"]
+      Wednesday 25 mai 2017
+         -> labo 6  : Assignment

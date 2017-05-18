@@ -84,7 +84,6 @@ async def start(ws):
                         if data['d']['author']['username'] == 'Axel Rieben':
                             task = asyncio.ensure_future(send_message(data['d']['author']['id'],
                                                                         data['d']['content']))
-
                             if data['d']['content'] == 'quit':
                                 print('Bye bye!')
                                 # On l'attend l'envoi du message ci-dessus.

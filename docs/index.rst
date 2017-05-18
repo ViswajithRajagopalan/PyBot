@@ -28,7 +28,7 @@ Example of conversation :
 -------------------------
 **Get some help**
 User : help
-Bot : new | delete | search | today | week | month
+Bot : new | quick | delete | search | today | week | month
       link documentation
 
 **Add a new event to the calendar**

@@ -65,6 +65,15 @@ def main():
 
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
     print('Getting the upcoming 10 events')
+
+    #ajoute un événement rapidement
+    created_event = service.events().quickAdd(
+        calendarId='primary',
+        text='Axel medecin vendredi 19 à 17h').execute()
+    #delete un event
+    service.events().delete(calendarId='primary', eventId='8843q3pq6rqpjdif9vo0c1kgk8').execute()
+
+    #récupère une liste liste d'événement
     eventsResult = service.events().list(
         calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
         orderBy='startTime').execute()
@@ -74,7 +83,7 @@ def main():
         print('No upcoming events found.')
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
+        print(start, event['summary'], event['id'])
 
 
     # Refer to the Python quickstart on how to setup the environment:

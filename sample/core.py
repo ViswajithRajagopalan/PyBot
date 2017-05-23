@@ -54,9 +54,9 @@ async def identify(ws):
     """Tâche qui identifie le bot à la Web Socket (indispensable)."""
     await ws.send_json({'op': 2,  # Identify
                         'd': {'token': TOKEN,
-                              'properties': {},
-                              'compress': True,  # implique le bout de code lié à zlib, pas nécessaire.
-                              'large_threshold': 250}})
+                            'properties': {},
+                            'compress': True,  # implique le bout de code lié à zlib, pas nécessaire.
+                            'large_threshold': 250}})
 
 async def start(ws):
     """Lance le bot sur l'adresse Web Socket donnée."""
@@ -83,8 +83,7 @@ async def start(ws):
                         print(data['d'])
                         if data['d']['author']['username'] == 'Axel Rieben':
                             task = asyncio.ensure_future(send_message(data['d']['author']['id'],
-                                                                      data['d']['content']))
-
+                                                                        data['d']['content']))
                             if data['d']['content'] == 'quit':
                                 print('Bye bye!')
                                 # On l'attend l'envoi du message ci-dessus.

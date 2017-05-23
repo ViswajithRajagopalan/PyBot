@@ -92,3 +92,7 @@ ENV/
 
 # idea project
 ./idea/
+
+
+#client_secret.json
+SandBox/client_secret.*

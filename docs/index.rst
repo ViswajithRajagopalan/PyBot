@@ -28,7 +28,7 @@ Example of conversation :
 -------------------------
 **Get some help**
 User : help
-Bot : new | quick | delete | search | today | week | month
+Bot : new | quick | delete | search | today | week | month | listEvent
       link documentation
 
 **Add a new event to the calendar**
@@ -62,3 +62,9 @@ User : search "labo"
 bot : search - ["labo"]
       Wednesday 25 mai 2017
          -> labo 6  : Assignment
+
+**use listEvent**
+User : listEvent
+bot : nbEvent ?
+User : 3
+bot : show you the first 3 events

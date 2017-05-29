@@ -81,7 +81,7 @@ async def start(ws):
                     last_sequence = data['s']
                     if data['t'] == "MESSAGE_CREATE":
                         print(data['d'])
-                        if data['d']['author']['username'] == 'Axel Rieben':
+                        if data['d']['author']['username'] == 'Axel Rieben' or data['d']['author']['username'] == 'Johnny Da Costa' :
                             task = asyncio.ensure_future(send_message(data['d']['author']['id'],
                                                                         data['d']['content']))
                             if data['d']['content'] == 'quit':

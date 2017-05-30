@@ -74,10 +74,29 @@ async def on_ready():
 #         await bot.send_message(message.channel, 'Hello.')
 
 @bot.command()
-async def insert():
-    """Insère un nouvelle événement dans le calendrier"""
+async def update(id, *params):
+    """Met à jour un événement du calendrier"""
 
-    await bot.say("Nouvelle élément insérer!")
+
+    service = await getService()  # on récupère le service
+    event = service.events().get(calendarId='primary', eventId=id).execute()
+    event['summary'] = " ".join(params)
+    updated_event = service.events().update(calendarId='primary', eventId=event['id'], body=event).execute()
+
+    await bot.say("Event portant l'id `{}` à bien été mise à jour dans le calendrier".format(id))
+
+
+@bot.command()
+async def delete(id):
+    """Suppression d'un event"""
+
+    service = await getService()  # on récupère le service
+    res = service.events().delete(calendarId='primary', eventId=id).execute()
+    if not res:
+        await bot.say("Event avec l'id `{}` à bien été supprimé dans le calendrier")
+    else:
+        await bot.say("`Id incorrect...`")
+
 
 
 @bot.command()
@@ -102,10 +121,29 @@ async def getService():
 
 
 @bot.command()
-async def delete():
-    """Supprime un événement du calendrier"""
+async def date(datestring):
+    """Chercher un event par rapport à une date"""
 
-    await bot.say("suppression")
+    # on vérifie si la date rentré est correct
+    if await isValidDate(datestring) is False:
+        await bot.say(":fearful: `La date entrée n'est pas dans le bon format... `\n"
+                      "Format attendu : `Y-m-d` \n "
+                      "**Eg. 2017 04 13**")
+    else:
+        dateMin = str(datestring)+"T00:00:00+02:00"
+        dateMax = str(datestring) + "T23:59:59+02:00"
+        print(dateMin, dateMax)
+        await showList(dateMax, dateMin)
+
+
+async def isValidDate(datestring):
+    """Vérifie si le format de la date est correct"""
+
+    try:
+        datetime.datetime.strptime(datestring, '%Y-%m-%d')
+        return True
+    except ValueError:
+        return False
 
 
 @bot.command()
@@ -135,27 +173,41 @@ async def month():
     dateMax = "T".join((tmp, "23:59:59+02:00"))
     await showList(dateMax)
 
-async def showList(dateMax):
+async def showList(dateMax, dateMin = False):
     """Affiche la liste des events selon bornes choisies."""
-    dateMin = "+".join((datetime.datetime.today().isoformat(), "02:00"))
+
+    if dateMin is False:
+        dateMin = "+".join((datetime.datetime.today().isoformat(), "02:00"))
+
     service = await getService()  # on récupère le service
     page_token = None
+
     while True:
         events = service.events().list(calendarId='primary',
                                        pageToken=page_token,
-                                       prettyPrint=True,
+                                       orderBy='startTime',
+                                       singleEvents=True,
                                        timeMin=dateMin,
                                        timeMax=dateMax).execute()
+
+        # on vérifie si il y a des events...
+        if not events['items']:
+            await bot.say(":sunglasses: **rien à l'horizon** ")
+            break
+        await bot.say("`L'opération peut prendre un certain temps...`")
         for event in events['items']:
+            emojy = ":date:"
             dateArr = await refactorDate(event)
             date = ' '.join(dateArr)
             summary = event['summary']
-            msg = " ".join((date, summary))
-            await bot.say(msg)
+            id = event['id']
+
+            await bot.say("{} *{}*  \t :id: `{}` \n"
+                          "```Event  {}\n```".format(emojy, date, id, summary))
 
         page_token = events.get('nextPageToken')
-
         if not page_token:
+            await bot.say("`Fin de la recherche`")
             break
 
 
@@ -164,11 +216,11 @@ async def refactorDate(event):
 
     if "date" in event['end']:  # on vérifie si l'évenement est sur toute la journée
         '''Le format event['end'][date] renvoie le format yyyyy-mm-dd'''
-        dateArr = event['end']['date'].split('-')[::-1]
+        dateArr = event['start']['date'].split('-')[::-1]
     else:
         '''Le format event['end']['dateTime] renvoie le format yyyy-mm-ddTHH-MM-S'''
         dateArr = event['end']['dateTime'].split('T')[0].split('-')[::-1]
     return dateArr
 
 
-bot.run('trop tard mais bon...')
+bot.run('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')

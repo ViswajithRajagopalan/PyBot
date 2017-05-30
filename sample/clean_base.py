@@ -58,66 +58,6 @@ async def identify(ws):
                             'compress': True,  # implique le bout de code lié à zlib, pas nécessaire.
                             'large_threshold': 250}})
 
-def help():
-    """Affiche l'aide"""
-    print('help')
-
-def new():
-    """Ajouter une entrée au calendrier"""
-    print('new')
-
-def quick():
-    """Ajouter une entrée au calendrier avec reconnaisance textuelle"""
-    print('quick')
-
-def delete():
-    """Supprimme une entrée du calendrier"""
-    print('delete')
-
-def search():
-    """Recherche les entrées correspondantes"""
-    print('search')
-
-def today():
-    """Affiche le calendrier pour aujourd'hui"""
-    print('today')
-
-def week():
-    """Affiche le calendrier pour cette semaine"""
-    print('week')
-
-def month():
-    """Affiche le calendrier pour ce mois"""
-    print('month')
-
-def list():
-    """Affiche les n prochaines entrées"""
-    print('list')
-
-command_dict = {'help':help, 'new':new, 'quick':quick, 'delete':delete, 'search':search, 'today':today, 'week':week, 'month':month, 'list':list}
-
-async def command_received(user_id, message):
-    """Verifications sur la commande reçu par l'utilisateur et redirection vers la bonne fonction"""
-    print('command received')
-
-    message = message.split(' ', 1)
-    command = message[0]
-    args_list = message[1:]
-    print(message)
-    print(command)
-    print(args_list)
-
-    if command in command_dict:
-        task = asyncio.ensure_future(send_message(user_id, 'valid command'))
-        func = command_dict[command]
-        func()
-    else:
-        task = asyncio.ensure_future(send_message(user_id, 'invalid command see help'))
-    if command == 'quit':
-        await asyncio.wait([task])
-        return False
-    return True
-
 async def start(ws):
     """Lance le bot sur l'adresse Web Socket donnée."""
     global last_sequence  # global est nécessaire pour modifier la variable
@@ -142,22 +82,18 @@ async def start(ws):
                     if data['t'] == "MESSAGE_CREATE":
                         print(data['d'])
                         if data['d']['author']['username'] == 'Axel Rieben':
-                            #task = asyncio.ensure_future(send_message(data['d']['author']['id'], data['d']['content']))
-                            result = await command_received(data['d']['author']['id'], data['d']['content'])
-
-                            if result == False:
+                            task = asyncio.ensure_future(send_message(data['d']['author']['id'],
+                                                                        data['d']['content']))
+                            if data['d']['content'] == 'quit':
                                 print('Bye bye!')
+                                # On l'attend l'envoi du message ci-dessus.
+                                await asyncio.wait([task])
                                 break
-
-                            # if data['d']['content'] == 'quit':
-                            #     print('Bye bye!')
-                            #     # On l'attend l'envoi du message ci-dessus.
-                            #     await asyncio.wait([task])
-                            #     break
                     else:
                         print('Todo?', data['t'])
                 else:
                     print("Unknown?", data)
+
 
 async def main():
     response = await api_call('/gateway')

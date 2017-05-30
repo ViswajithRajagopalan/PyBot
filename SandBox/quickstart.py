@@ -2,9 +2,6 @@
 from __future__ import print_function
 import httplib2
 import os
-import discord
-from discord.ext.commands
-
 
 from apiclient import discovery
 from oauth2client import client
@@ -54,6 +51,7 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
+
 def switchPerso(command):
     '''Switch personnel qui va appeler nos fonctions pour nous. DRY'''
     switch = {
@@ -81,6 +79,9 @@ def delete():
 def quickadd():
     '''insère un évévement rapidement avec une simple string contenant une date'''
     print("quickadd() function called")
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('calendar', 'v3', http=http)
     service.events().quickAdd(
         calendarId='primary',
         text=input(' -> ')).execute()

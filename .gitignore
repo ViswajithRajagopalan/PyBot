@@ -95,4 +95,4 @@ ENV/
 
 
 #client_secret.json
-SandBox/client_secret.*
+SandBox/client_secret.*".idea" 

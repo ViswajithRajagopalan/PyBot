@@ -128,7 +128,7 @@ async def date(datestring):
     if await isValidDate(datestring) is False:
         await bot.say(":fearful: `La date entrée n'est pas dans le bon format... `\n"
                       "Format attendu : `Y-m-d` \n "
-                      "**Eg. 2017 04 13**")
+                      "**Eg. 2017-04-13**")
     else:
         dateMin = str(datestring)+"T00:00:00+02:00"
         dateMax = str(datestring) + "T23:59:59+02:00"
@@ -223,4 +223,4 @@ async def refactorDate(event):
     return dateArr
 
 
-bot.run('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+bot.run('un token ne se partage pas....')

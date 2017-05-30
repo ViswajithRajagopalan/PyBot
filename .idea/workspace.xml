@@ -6,12 +6,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="752457eb-a2ba-4c15-b128-079fb4a7d4e8" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/PyBot.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/SandBox/extcommand.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SandBox/extcommand.py" afterPath="$PROJECT_DIR$/SandBox/extcommand.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -38,11 +34,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="extcommand.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="extcommand.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SandBox/extcommand.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="211">
-              <caret line="116" column="0" lean-forward="false" selection-start-line="116" selection-start-column="0" selection-end-line="118" selection-end-column="0" />
+            <state relative-caret-position="402">
+              <caret line="173" column="30" lean-forward="false" selection-start-line="173" selection-start-column="30" selection-end-line="173" selection-end-column="30" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
                 <element signature="e#1922#2047#0" expanded="false" />
@@ -55,11 +51,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
-              <caret line="90" column="0" lean-forward="true" selection-start-line="90" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
+            <state relative-caret-position="173">
+              <caret line="89" column="12" lean-forward="true" selection-start-line="89" selection-start-column="12" selection-end-line="89" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -797,10 +793,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="173">
+          <caret line="89" column="12" lean-forward="true" selection-start-line="89" selection-start-column="12" selection-end-line="89" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/SandBox/extcommand.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="116" column="0" lean-forward="false" selection-start-line="116" selection-start-column="0" selection-end-line="118" selection-end-column="0" />
+        <state relative-caret-position="402">
+          <caret line="173" column="30" lean-forward="false" selection-start-line="173" selection-start-column="30" selection-end-line="173" selection-end-column="30" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
             <element signature="e#1922#2047#0" expanded="false" />
@@ -809,14 +813,6 @@
             <element signature="e#2812#3075#0" expanded="false" />
             <element signature="e#3117#3192#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="90" column="0" lean-forward="true" selection-start-line="90" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>

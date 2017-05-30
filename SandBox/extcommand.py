@@ -171,4 +171,4 @@ async def refactorDate(event):
     return dateArr
 
 
-bot.run('MzEyMTcxNjQ4OTczMjc1MTM3.C_4xkQ.mZ6G39IIlSufZNRw91a0hKX9cNs')
+bot.run('trop tard mais bon...')

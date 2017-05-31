@@ -1,4 +1,9 @@
 from __future__ import print_function
+
+import discord
+from discord.ext import commands
+import json
+import arrow
 import httplib2
 import os
 from datetime import datetime, timezone
@@ -65,17 +70,14 @@ async def on_ready():
     print('------')
 
 
-
-# @bot.event
-# async def on_message(message):
-#     if message.content.startswith('$greet'):
-#         await bot.send_message(message.channel, 'Say hello')
-#         msg = await bot.wait_for_message(author=message.author, content='hello')
-#         await bot.send_message(message.channel, 'Hello.')
+@bot.event
+async def on_command_error(error, ctx):
+        await bot.send_message(ctx.message.author, error)
 
 @bot.command()
 async def update(id, *params):
-    """Met à jour un événement du calendrier"""
+    """Met à jour un événement du calendrier
+        Eg. ?update id test de math1B"""
 
 
     service = await getService()  # on récupère le service
@@ -88,12 +90,13 @@ async def update(id, *params):
 
 @bot.command()
 async def delete(id):
-    """Suppression d'un event"""
+    """Suppression d'un event.
+        Eg. ?delete id"""
 
     service = await getService()  # on récupère le service
     res = service.events().delete(calendarId='primary', eventId=id).execute()
     if not res:
-        await bot.say("Event avec l'id `{}` à bien été supprimé dans le calendrier")
+        await bot.say("Event avec l'id `{}` à bien été supprimé dans le calendrier".format(id))
     else:
         await bot.say("`Id incorrect...`")
 
@@ -101,37 +104,41 @@ async def delete(id):
 
 @bot.command()
 async def quick(*message):
-    """Ajout rapide d'un événement"""
-    service = await getService() # on récupère le service
-    created_event = service.events().quickAdd(
-       calendarId='primary',
-       text=" ".join(message)).execute()
+    """Ajout rapide d'un événement
+        Eg. ?quick rdz chez le medecin le 5 juin à 15h"""
 
-    await bot.say(created_event)
+    if not message:
+        await bot.say(":flushed:  ```veuillez insérer un événement en paramètre \n"
+                      "Eg. ?quick rdz chez le medecin le 23 juin à 15h```")
+    else:
+        service = await getService() # on récupère le service
+        created_event = service.events().quickAdd(
+           calendarId='primary',
+           text=" ".join(message)).execute()
+
+        await bot.say(":mailbox: Nouvelle enregistrement {}".format(created_event['htmlLink']))
 
 async def getService():
-    """Va nous retourner l'objet qui va nous permettre de communiquer
-    
-    avec l'api calendar."""
+    """Va nous retourner l'objet qui va nous permettre de communiquer avec l'api calendar."""
 
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
     return service
 
-
 @bot.command()
-async def date(datestring):
-    """Chercher un event par rapport à une date"""
+async def date(timeMin):
+    """Chercher un event par rapport à une date.
+        Eg. ?date 2017-03-23"""
 
     # on vérifie si la date rentré est correct
-    if await isValidDate(datestring) is False:
+    if await isValidDate(timeMin) is False:
         await bot.say(":fearful: `La date entrée n'est pas dans le bon format... `\n"
                       "Format attendu : `Y-m-d` \n "
                       "**Eg. 2017-04-13**")
     else:
-        dateMin = str(datestring)+"T00:00:00+02:00"
-        dateMax = str(datestring) + "T23:59:59+02:00"
+        dateMin = arrow.get(timeMin).to("Europe/Zurich")
+        dateMax = dateMin.replace(hour=24)
         print(dateMin, dateMax)
         await showList(dateMax, dateMin)
 
@@ -148,7 +155,8 @@ async def isValidDate(datestring):
 
 @bot.command()
 async def day():
-    """Affiche les événements du jour"""
+    """Affiche les événements du jour.
+        Eg. ?day"""
 
     dateMax = datetime.datetime.today().isoformat()
     tmp = dateMax.split('T')[0]  # on garde seulement le format yyyy-mm-dd
@@ -157,7 +165,8 @@ async def day():
 
 @bot.command()
 async def weeks():
-    """Affiche les événements de la semaine"""
+    """Affiche les événements de la semaine.
+        Eg. ?weeks"""
 
     dateMax = (datetime.datetime.today()+datetime.timedelta(days=7)).isoformat()
     tmp = dateMax.split("T")[0]  # on garde seulement le format yyyy-mm-dd
@@ -166,7 +175,8 @@ async def weeks():
 
 @bot.command()
 async def month():
-    """Affiche les événements du jour"""
+    """Affiche les événements du mois.
+        Eg. ?month"""
 
     dateMax = (datetime.datetime.today()+datetime.timedelta(days=28)).isoformat()
     tmp = dateMax.split("T")[0]  # on garde seulement le format yyyy-mm-dd
@@ -177,11 +187,10 @@ async def showList(dateMax, dateMin = False):
     """Affiche la liste des events selon bornes choisies."""
 
     if dateMin is False:
-        dateMin = "+".join((datetime.datetime.today().isoformat(), "02:00"))
+        dateMin = arrow.utcnow().to("Europe/Zurich") # on récupère la date d'ajd
 
     service = await getService()  # on récupère le service
     page_token = None
-
     while True:
         events = service.events().list(calendarId='primary',
                                        pageToken=page_token,
@@ -201,7 +210,7 @@ async def showList(dateMax, dateMin = False):
             date = ' '.join(dateArr)
             summary = event['summary']
             id = event['id']
-
+            print(event)
             await bot.say("{} *{}*  \t :id: `{}` \n"
                           "```Event  {}\n```".format(emojy, date, id, summary))
 
@@ -222,5 +231,7 @@ async def refactorDate(event):
         dateArr = event['end']['dateTime'].split('T')[0].split('-')[::-1]
     return dateArr
 
+with open('config.json') as json_data:
+    d = json.load(json_data)
+    bot.run(d["token"])
 
-bot.run('un token ne se partage pas....')

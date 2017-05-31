@@ -138,8 +138,9 @@ async def date(timeMin):
                       "**Eg. 2017-04-13**")
     else:
         dateMin = arrow.get(timeMin).to("Europe/Zurich")
-        dateMax = dateMin.replace(hour=24)
+        dateMax = dateMin.replace(hour=23, minutes=59, seconds=59)
         print(dateMin, dateMax)
+        await showList(dateMax, dateMin)
         await showList(dateMax, dateMin)
 
 
@@ -158,9 +159,7 @@ async def day():
     """Affiche les événements du jour.
         Eg. ?day"""
 
-    dateMax = datetime.datetime.today().isoformat()
-    tmp = dateMax.split('T')[0]  # on garde seulement le format yyyy-mm-dd
-    dateMax = "T".join((tmp, "23:59:59+02:00"))  # le +02:00 représente le fuseau horaire
+    dateMax = arrow.utcnow().to("Europe/Zurich").replace(hours=23, minutes=59, seconds=59)
     await showList(dateMax)
 
 @bot.command()
@@ -168,9 +167,7 @@ async def weeks():
     """Affiche les événements de la semaine.
         Eg. ?weeks"""
 
-    dateMax = (datetime.datetime.today()+datetime.timedelta(days=7)).isoformat()
-    tmp = dateMax.split("T")[0]  # on garde seulement le format yyyy-mm-dd
-    dateMax = "T".join((tmp, "23:59:59+02:00"))
+    dateMax = arrow.utcnow().to("Europe/Zurich").replace(days=7, hours=23, minutes=59, seconds=59)
     await showList(dateMax)
 
 @bot.command()
@@ -178,9 +175,7 @@ async def month():
     """Affiche les événements du mois.
         Eg. ?month"""
 
-    dateMax = (datetime.datetime.today()+datetime.timedelta(days=28)).isoformat()
-    tmp = dateMax.split("T")[0]  # on garde seulement le format yyyy-mm-dd
-    dateMax = "T".join((tmp, "23:59:59+02:00"))
+    dateMax = arrow.utcnow().to("Europe/Zurich").replace(days=28, hours=23, minutes=59, seconds=59)
     await showList(dateMax)
 
 async def showList(dateMax, dateMin = False):
@@ -210,9 +205,8 @@ async def showList(dateMax, dateMin = False):
             date = ' '.join(dateArr)
             summary = event['summary']
             id = event['id']
-            print(event)
             await bot.say("{} *{}*  \t :id: `{}` \n"
-                          "```Event  {}\n```".format(emojy, date, id, summary))
+                          "```-> {}\n```".format(emojy, date, id, summary))
 
         page_token = events.get('nextPageToken')
         if not page_token:
@@ -223,12 +217,17 @@ async def showList(dateMax, dateMin = False):
 async def refactorDate(event):
     """Fonction qui nous retourne la date selon le format dd-mm-yyyy"""
 
+    dateArr = None
     if "date" in event['end']:  # on vérifie si l'évenement est sur toute la journée
         '''Le format event['end'][date] renvoie le format yyyyy-mm-dd'''
-        dateArr = event['start']['date'].split('-')[::-1]
+        dateArr = arrow.get(event['start']['date']).format("DD-MM-YYYY")
+        dateArr += " toute la journée"
     else:
         '''Le format event['end']['dateTime] renvoie le format yyyy-mm-ddTHH-MM-S'''
-        dateArr = event['end']['dateTime'].split('T')[0].split('-')[::-1]
+        timeMax = arrow.get(event['end']['dateTime']).format("HH:mm")
+        timeMin = arrow.get(event['start']['dateTime']).format("DD-MM-YYYY | HH:mm")
+        dateArr = " ".join((timeMin, " à ", timeMax))
+
     return dateArr
 
 with open('config.json') as json_data:

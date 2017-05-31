@@ -158,7 +158,7 @@ async def isValidDate(datestring):
 async def day():
     """Affiche les événements du jour.
         Eg. ?day"""
-
+    print(bot.user)
     dateMax = arrow.utcnow().to("Europe/Zurich").replace(hours=23, minutes=59, seconds=59)
     await showList(dateMax)
 

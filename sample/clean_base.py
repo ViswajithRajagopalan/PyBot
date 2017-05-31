@@ -11,7 +11,7 @@ if loop.is_closed():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
-TOKEN = "MzEyMTcxNjQ4OTczMjc1MTM3.C_4xkQ.mZ6G39IIlSufZNRw91a0hKX9cNs"
+TOKEN = "je suis un token"
 
 URL = "https://discordapp.com/api"
 HEADERS = {

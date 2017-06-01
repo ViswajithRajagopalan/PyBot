@@ -2,65 +2,54 @@
 Welcome to PyCalendar's documentation!
 ======================================
 
-Contents:
+====================
+What is pyCalendar ?
+====================
 
-.. toctree::
-   :maxdepth: 2
+PyCalendar is a Discord bot that manage a Google shared calendar.
+if you want to use the bot, send a mail at `pyprojectcalendar@gmail.com <pyprojectcalendar@gmail.com>`_ mentionning your Discord username.
 
+====================
+How to use the bot ?
+====================
 
+Comands availaible
+------------------
 
-Indices and tables
-==================
+Every command start with '?' character.
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
-===================
-How to use the bot
-===================
-
-Example of conversation :
--------------------------
 **Get some help**
-User : help
-Bot : new | quick | delete | search | today | week | month | listEvent
-      link documentation
+
+?help
 
 **Add a new event to the calendar**
-User : new
-Bot : event title ?
-User : test de Python
-Bot : event description ?
-User : all of the subject
-Bot : data ? (format dd.mm.yyyy)
-User : 23.04.2017
-Bot : New event add_.
-.. _New event add: #
 
-**Get list event**
-User : today
-Bot : today - calendar
-      test de python : all of the subject
+?add your_event
 
+example : ?add Dentist tommorow at 5 o'clock
 
-User : week */same with the command month/*
-Bot : week - calendar
-      Monday 23 mai 2017
-         -> test de python : all of the subject
+**Delete an event of the calendar**
 
-      Wednesday 25 mai 2017
-         -> labo 6  : Assignment
+?delete event_id
 
+**Update an event of the calendar**
 
-**Use search**
-User : search "labo"
-bot : search - ["labo"]
-      Wednesday 25 mai 2017
-         -> labo 6  : Assignment
+?update event_id
 
-**use listEvent**
-User : listEvent
-bot : nbEvent ?
-User : 3
-bot : show you the first 3 events
+**Search events containing a given word or sentence**
+
+?s your_word
+
+example : ?s Dentist
+
+**Show event at a given date**
+
+?date YYYY-MM-DD
+
+**Show events of the day/week/month**
+
+?day
+
+?week
+
+?month

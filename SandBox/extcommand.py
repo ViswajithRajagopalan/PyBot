@@ -1,19 +1,15 @@
-from __future__ import print_function
-
-import discord
-from discord.ext import commands
 import json
 import random
-import urllib.request
+import asyncio
 import arrow
 import httplib2
 import os
 import feedparser
-from datetime import datetime, timezone
 from apiclient import discovery
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
+from discord.ext import commands
 
 import datetime
 
@@ -53,15 +49,23 @@ def get_credentials():
         flow.user_agent = APPLICATION_NAME
         if flags:
             credentials = tools.run_flow(flow, store, flags)
-        else: # Needed only for compatibility with Python 2.6
+        else:  # Needed only for compatibility with Python 2.6
             credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
 
 
-from discord.ext import commands
 description = '''PyCalendar'''
 bot = commands.Bot(command_prefix='?', description=description)
+
+
+def getService():
+    """Va nous retourner l'objet qui va nous permettre de communiquer avec l'api calendar."""
+
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    return discovery.build('calendar', 'v3', http=http)
+
 
 @bot.event
 async def on_ready():
@@ -71,13 +75,13 @@ async def on_ready():
     print(bot.user.id)
     print('the service is started')
     print('------')
-    msg = infoMatin()
-
+    print('------')
 
 
 @bot.event
 async def on_command_error(error, ctx):
-        await bot.send_message(ctx.message.author, error)
+    raise error
+    await bot.send_message(ctx.message.author, error)
 
 
 @bot.command()
@@ -85,14 +89,12 @@ async def q(query):
     """Recherche un événement qui contient la string
         Eg. ?q test"""
 
+    service = getService()  # on récupère le service
+    loop =  asyncio.get_event_loop()
+    events = await loop.run_in_executor(None, event_query, service, 'primary', query, arrow.utcnow())
 
-    service = await getService()  # on récupère le service
-
-    events = service.events().list(calendarId='primary', q=query, timeMin=arrow.utcnow().to("Europe/Zurich")).execute()
     for event in events["items"]:
         await success(event)
-
-
 
 
 @bot.command()
@@ -101,14 +103,14 @@ async def update(id, *params):
         Eg. ?update id test de math1B"""
 
 
-    service = await getService()  # on récupère le service
-    event = service.events().get(calendarId='primary', eventId=id).execute()
+    service = getService()  # on récupère le service
+    loop =  asyncio.get_event_loop()
+    event = await loop.run_in_executor(event_get, service, 'primary', id)
     event['summary'] = " ".join(params)
-    updated_event = service.events().update(calendarId='primary', eventId=event['id'], body=event).execute()
+    updated_event = await loop.run_in_executor(event_update, service, 'primary', id, event)
 
     await bot.say("Event portant l'id `{}` à bien été mise à jour dans le calendrier".format(id))
     await success(updated_event)
-
 
 
 @bot.command()
@@ -116,14 +118,15 @@ async def delete(id):
     """Suppression d'un event.
         Eg. ?delete id"""
 
-    service = await getService()  # on récupère le service
-    res = service.events().delete(calendarId='primary', eventId=id).execute()
+    service = getService()  # on récupère le service
+    loop =  asyncio.get_event_loop()
+    res = await loop.run_in_executor(event_delete, service, 'primary', id)
+
     print(res)
     if not res:
         await bot.say("Event avec l'id `{}` à bien été supprimé dans le calendrier".format(id))
     else:
         await bot.say("`Id incorrect...`")
-
 
 
 @bot.command()
@@ -135,7 +138,7 @@ async def add(*message):
         await bot.say(":flushed:  ```veuillez insérer un événement en paramètre \n"
                       "Eg. ?add rdz chez le medecin le 23 juin à 15h```")
     else:
-        service = await getService() # on récupère le service
+        service = getService() # on récupère le service
         created_event = service.events().quickAdd(
            calendarId='primary',
            text=" ".join(message)).execute()
@@ -143,13 +146,6 @@ async def add(*message):
         await bot.say(":mailbox: Nouvelle enregistrement {}".format(created_event['htmlLink']))
         await success(created_event)
 
-async def getService():
-    """Va nous retourner l'objet qui va nous permettre de communiquer avec l'api calendar."""
-
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
-    return service
 
 @bot.command()
 async def date(timeMin):
@@ -157,25 +153,15 @@ async def date(timeMin):
         Eg. ?date 2017-03-23"""
 
     # on vérifie si la date rentré est correct
-    if await isValidDate(timeMin) is False:
+    if isValidDate(timeMin) is False:
         await bot.say(":fearful: `La date entrée n'est pas dans le bon format... `\n"
                       "Format attendu : `Y-m-d` \n "
                       "**Eg. 2017-04-13**")
     else:
-        dateMin = arrow.get(timeMin).to("Europe/Zurich")
+        dateMin = arrow.get(timeMin)
         dateMax = dateMin.replace(hour=23, minutes=59, seconds=59)
         print(dateMin, dateMax)
         await showList(dateMax, dateMin)
-
-
-async def isValidDate(datestring):
-    """Vérifie si le format de la date est correct"""
-
-    try:
-        datetime.datetime.strptime(datestring, '%Y-%m-%d')
-        return True
-    except ValueError:
-        return False
 
 
 @bot.command()
@@ -183,24 +169,23 @@ async def day():
     """Affiche les événements du jour.
         Eg. ?day"""
     print(bot.user)
-    dateMax = arrow.utcnow().to("Europe/Zurich").replace(hours=23, minutes=59, seconds=59)
-    await showList(dateMax)
+    await showList(nextDay())
+
 
 @bot.command()
 async def weeks():
     """Affiche les événements de la semaine.
         Eg. ?weeks"""
+    print(nextDay(7))
+    await showList(nextDay(7))
 
-    dateMax = arrow.utcnow().to("Europe/Zurich").replace(days=7, hours=23, minutes=59, seconds=59)
-    await showList(dateMax)
 
 @bot.command()
 async def month():
     """Affiche les événements du mois.
         Eg. ?month"""
+    await showList(nextDay(28))
 
-    dateMax = arrow.utcnow().to("Europe/Zurich").replace(days=28, hours=23, minutes=59, seconds=59)
-    await showList(dateMax)
 
 async def success(event):
     emojy = ":date:"
@@ -215,24 +200,21 @@ async def showList(dateMax, dateMin = False):
     """Affiche la liste des events selon bornes choisies."""
 
     if dateMin is False:
-        dateMin = arrow.utcnow().to("Europe/Zurich") # on récupère la date d'ajd
+        dateMin = arrow.utcnow() # on récupère la date d'ajd
 
-    service = await getService()  # on récupère le service
+    service = getService()  # on récupère le service
     page_token = None
     while True:
-        events = service.events().list(calendarId='primary',
-                                       pageToken=page_token,
-                                       orderBy='startTime',
-                                       singleEvents=True,
-                                       timeMin=dateMin,
-                                       timeMax=dateMax).execute()
+        service = getService()  # on récupère le service
+        loop = asyncio.get_event_loop()
+        events = await loop.run_in_executor(None, event_list, service, 'primary', page_token, dateMin, dateMax)
 
         # on vérifie si il y a des events...
         if not events['items']:
             await bot.say(":sunglasses: **rien à l'horizon**")
             before = ":newspaper2: le matin :  "
             msg = infoMatin()
-            await bot.say("{} `{}`".format(before, msg))
+            await bot.say("{} {}".format(before, msg))
             break
         await bot.say("`L'opération peut prendre un certain temps...`")
         for event in events['items']:
@@ -245,6 +227,7 @@ async def showList(dateMax, dateMin = False):
 
 
 def infoMatin():
+
     python_wiki_rss_url = "http://www.lematin.ch/monde/rss.html"
     feeds = feedparser.parse(python_wiki_rss_url)
     mapFeed=[]
@@ -252,6 +235,23 @@ def infoMatin():
         mapFeed.append(feed["title"] + "\n " + feed["link"])
 
     return random.choice(mapFeed)
+
+
+def nextDay(d=1):
+    """Retourne le jour + days"""
+    # obligé de mettre .to("Europe...) sinon l'heure est en retard de 2h00...
+    return arrow.utcnow().to("Europe/Zurich").replace(day=d, hours=23, minutes=59, seconds=59)
+
+
+def isValidDate(datestring):
+    """Vérifie si le format de la date est correct"""
+
+    try:
+        datetime.datetime.strptime(datestring, '%Y-%m-%d')
+        return True
+    except ValueError:
+        return False
+
 
 def refactorDate(event):
     """Fonction qui nous retourne la date selon le format dd-mm-yyyy"""
@@ -268,6 +268,32 @@ def refactorDate(event):
         dateArr = " ".join((timeMin, " à ", timeMax))
 
     return dateArr
+
+
+def event_list(service, calendarId, page_token, dateMin, dateMax):
+    return service.events().list(calendarId='primary',
+                                   pageToken=page_token,
+                                   orderBy='startTime',
+                                   singleEvents=True,
+                                   timeMin=dateMin,
+                                   timeMax=dateMax).execute()
+
+
+def event_query(service, calendarId, q, timeMin):
+    return service.events().list(calendarId=calendarId, q=q, timeMin=timeMin).execute()
+
+
+def event_get(service, calendarId, id):
+    return service.events().list(calendarId=calendarId, event_id=id).execute()
+
+
+def event_update(service, calendarId, id, body):
+    return service.events().update(calendarId=calendarId, eventId=id, body=body).execute()
+
+
+def event_delete(service, calendarId, id):
+    return service.events().delete(calendarId=calendarId, event_id=id).execute()
+
 
 with open('config.json') as json_data:
     d = json.load(json_data)

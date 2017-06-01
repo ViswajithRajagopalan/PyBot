@@ -66,7 +66,6 @@ def getService():
     http = credentials.authorize(httplib2.Http())
     return discovery.build('calendar', 'v3', http=http)
 
-
 @bot.event
 async def on_ready():
 
@@ -102,12 +101,11 @@ async def update(id, *params):
     """Met à jour un événement du calendrier
         Eg. ?update id test de math1B"""
 
-
     service = getService()  # on récupère le service
     loop =  asyncio.get_event_loop()
-    event = await loop.run_in_executor(event_get, service, 'primary', id)
+    event = await loop.run_in_executor(None, event_get, service, 'primary', id)
     event['summary'] = " ".join(params)
-    updated_event = await loop.run_in_executor(event_update, service, 'primary', id, event)
+    updated_event = await loop.run_in_executor(None, event_update, service, 'primary', id, event)
 
     await bot.say("Event portant l'id `{}` à bien été mise à jour dans le calendrier".format(id))
     await success(updated_event)
@@ -120,7 +118,7 @@ async def delete(id):
 
     service = getService()  # on récupère le service
     loop =  asyncio.get_event_loop()
-    res = await loop.run_in_executor(event_delete, service, 'primary', id)
+    res = await loop.run_in_executor(None, event_delete, service, 'primary', id)
 
     print(res)
     if not res:
@@ -284,15 +282,15 @@ def event_query(service, calendarId, q, timeMin):
 
 
 def event_get(service, calendarId, id):
-    return service.events().list(calendarId=calendarId, event_id=id).execute()
+    return service.events().get(calendarId=calendarId, eventId=id).execute()
 
 
-def event_update(service, calendarId, id, body):
-    return service.events().update(calendarId=calendarId, eventId=id, body=body).execute()
+def event_update(service, calendarId, id, event):
+    return service.events().update(calendarId=calendarId, eventId=id, body=event).execute()
 
 
 def event_delete(service, calendarId, id):
-    return service.events().delete(calendarId=calendarId, event_id=id).execute()
+    return service.events().delete(calendarId=calendarId, eventId=id).execute()
 
 
 with open('config.json') as json_data:

@@ -21,6 +21,6 @@ setup(
     packages=find_packages(exclude=('tests', 'docs')),
     keywords='discord asyncio bot google calendar',
     install_requires=(
-        'aiohttp>=2.0.0'
+        'aiohttp>=2.0.0',
     )
 )

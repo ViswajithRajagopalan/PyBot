@@ -1,2 +1,6 @@
-nose
-sphinx
+aiohttp>=2.0.0
+arrow
+httplib2
+feedparser
+google-api-python-client
+discord.py

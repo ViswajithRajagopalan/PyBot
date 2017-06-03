@@ -93,7 +93,10 @@ ENV/
 # idea project
 
 
-#client_secret.json
+# config files
+
 SandBox/client_secret.*
-".idea"
-/SandBox/config.json
+SandBox/config.json
+sample/client_secret.json
+sample/config.json
+*.idea

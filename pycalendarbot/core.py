@@ -90,12 +90,15 @@ async def q(query):
     """Recherche un évènement qui contient la string
         Eg. ?q test"""
 
-    service = getService()  # on récupère le service
-    loop =  asyncio.get_event_loop()
-    events = await loop.run_in_executor(None, event_query, service, 'primary', query, arrow.utcnow())
+    if not query:
+        service = getService()  # on récupère le service
+        loop =  asyncio.get_event_loop()
+        events = await loop.run_in_executor(None, event_query, service, 'primary', query, arrow.utcnow())
 
-    for event in events["items"]:
-        await success(event)
+        for event in events["items"]:
+            await success(event)
+    else
+        bot.say("Missing argument")
 
 
 @bot.command()

@@ -95,8 +95,6 @@ ENV/
 
 # config files
 
-SandBox/client_secret.*
-SandBox/config.json
 sample/client_secret.json
 sample/config.json
 *.idea

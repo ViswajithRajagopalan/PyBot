@@ -10,8 +10,9 @@ with open(path.join(here, 'README.rst'), 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='PyCalendar',
-    version='0.1.0',
+    name='calendarbot',
+    packages = ['calendarbot'],
+    version='1.0.0',
     description='Discord bot that handle a Google calendar',
     long_description=long_description,
     author='Axel Rieben & Johnny Da Costa',
@@ -22,5 +23,10 @@ setup(
     keywords='discord asyncio bot google calendar',
     install_requires=(
         'aiohttp>=2.0.0',
+        'arrow',
+        'httplib2',
+        'feedparser',
+        'google-api-python-client',
+        'discord.py'
     )
 )

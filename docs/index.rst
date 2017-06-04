@@ -1,17 +1,27 @@
 
-Welcome to PyCalendar's documentation!
+Welcome to calendarbot's documentation!
 ======================================
 
 ====================
-What is pyCalendar ?
+What is calendarbot ?
 ====================
 
-PyCalendar is a Discord bot that manage a Google shared calendar.
-if you want to use the bot, send a mail at `pyprojectcalendar@gmail.com <pyprojectcalendar@gmail.com>`_ mentionning your Discord username.
+Calendarbot is a Discord bot that manage a Google shared calendar.
+if you want to have the permission to use the shared calendar, send a mail at `pyprojectcalendar@gmail.com <pyprojectcalendar@gmail.com>`_ mentionning your Discord username.
 
 ====================
 How to use the bot ?
 ====================
+
+Installation
+------------
+
+$ pip install calendarbot
+
+Configuration
+-------------
+
+Insert your Discord bot token in the conf.py file.
 
 Comands availaible
 ------------------

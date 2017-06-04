@@ -1,3 +1,5 @@
+"""Programme principal."""
+
 import json
 import random
 import asyncio
@@ -10,8 +12,8 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 from discord.ext import commands
-
 import datetime
+import conf
 
 try:
     import argparse
@@ -60,7 +62,7 @@ bot = commands.Bot(command_prefix='?', description=description)
 
 
 def getService():
-    """Va nous retourner l'objet qui va nous permettre de communiquer avec l'api calendar."""
+    """Retourne l'objet qui va nous permettre de communiquer avec l'API Google Calendar."""
 
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
@@ -85,7 +87,7 @@ async def on_command_error(error, ctx):
 
 @bot.command()
 async def q(query):
-    """Recherche un événement qui contient la string
+    """Recherche un évènement qui contient la string
         Eg. ?q test"""
 
     service = getService()  # on récupère le service
@@ -98,7 +100,7 @@ async def q(query):
 
 @bot.command()
 async def update(id, *params):
-    """Met à jour un événement du calendrier
+    """Met à jour un évènement du calendrier
         Eg. ?update id test de math1B"""
 
     service = getService()  # on récupère le service
@@ -113,7 +115,7 @@ async def update(id, *params):
 
 @bot.command()
 async def delete(id):
-    """Suppression d'un event.
+    """Suppression d'un évènement.
         Eg. ?delete id"""
 
     service = getService()  # on récupère le service
@@ -129,8 +131,8 @@ async def delete(id):
 
 @bot.command()
 async def add(*message):
-    """Ajout rapide d'un événement
-        Eg. ?add rdz chez le medecin le 5 juin à 15h"""
+    """Ajout rapide d'un évènement
+        Eg. ?add rdv chez le médecin le 5 juin à 15h"""
 
     if not message:
         await bot.say(":flushed:  ```veuillez insérer un événement en paramètre \n"
@@ -141,13 +143,13 @@ async def add(*message):
            calendarId='primary',
            text=" ".join(message)).execute()
 
-        await bot.say(":mailbox: Nouvelle enregistrement {}".format(created_event['htmlLink']))
+        await bot.say(":mailbox: Nouvel enregistrement {}".format(created_event['htmlLink']))
         await success(created_event)
 
 
 @bot.command()
 async def date(timeMin):
-    """Chercher un event par rapport à une date.
+    """Chercher un évènement par rapport à une date.
         Eg. ?date 2017-03-23"""
 
     # on vérifie si la date rentré est correct
@@ -164,7 +166,7 @@ async def date(timeMin):
 
 @bot.command()
 async def day():
-    """Affiche les événements du jour.
+    """Affiche les évènements du jour.
         Eg. ?day"""
     print(bot.user)
     await showList(nextDay())
@@ -172,7 +174,7 @@ async def day():
 
 @bot.command()
 async def weeks():
-    """Affiche les événements de la semaine.
+    """Affiche les évènements de la semaine.
         Eg. ?weeks"""
     print(nextDay(7))
     await showList(nextDay(7))
@@ -180,7 +182,7 @@ async def weeks():
 
 @bot.command()
 async def month():
-    """Affiche les événements du mois.
+    """Affiche les évènements du mois.
         Eg. ?month"""
     await showList(nextDay(28))
 
@@ -194,8 +196,9 @@ async def success(event):
     await bot.say("{} *{}*  \t :id: `{}` \n"
                   "```-> {}\n```".format(emojy, date, id, summary))
 
+
 async def showList(dateMax, dateMin = False):
-    """Affiche la liste des events selon bornes choisies."""
+    """Affiche la liste des évènements selon les bornes choisies."""
 
     if dateMin is False:
         dateMin = arrow.utcnow() # on récupère la date d'ajd
@@ -293,8 +296,9 @@ def event_delete(service, calendarId, id):
     return service.events().delete(calendarId=calendarId, eventId=id).execute()
 
 
-with open('config.json') as json_data:
-    d = json.load(json_data)
-    bot.run(d["token"])
+def main():
+    bot.run(conf.DISCORD_TOKEN)
 
 
+if __name__ == '__main__':
+    main()

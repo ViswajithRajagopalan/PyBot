@@ -81,7 +81,6 @@ async def on_ready():
 
 @bot.event
 async def on_command_error(error, ctx):
-    raise error
     await bot.send_message(ctx.message.author, error)
 
 
@@ -90,15 +89,15 @@ async def q(query):
     """Recherche un évènement qui contient la string
         Eg. ?q test"""
 
-    if not query:
-        service = getService()  # on récupère le service
-        loop =  asyncio.get_event_loop()
-        events = await loop.run_in_executor(None, event_query, service, 'primary', query, arrow.utcnow())
+    service = getService()  # on récupère le service
+    loop = asyncio.get_event_loop()
+    events = await loop.run_in_executor(None, event_query, service, 'primary', query, arrow.utcnow())
 
+    if not events["items"]:
+         await bot.say("Aucun événement contenant la requête `{}`? n'a été trouvé...:rolling_eyes: ".format(query))
+    else:
         for event in events["items"]:
-            await success(event)
-    else
-        bot.say("Missing argument")
+                await success(event)
 
 
 @bot.command()

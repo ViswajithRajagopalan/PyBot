@@ -95,7 +95,6 @@ ENV/
 
 # config files
 
-pycalendarbot/client_secret.json
 pycalendarbot/config.json
 pycalendarbot/__pycache__
 *.idea

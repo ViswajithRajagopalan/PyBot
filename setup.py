@@ -1,5 +1,5 @@
 
-"""pycalendarbot bot for Discord."""
+"""discordcalendarbot bot for Discord."""
 
 from os import path
 from setuptools import setup
@@ -10,9 +10,9 @@ with open(path.join(here, 'README.rst'), 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='pycalendarbot',
-    packages = ['pycalendarbot'],
-    version='1.0.0',
+    name='discordcalendarbot',
+    packages = ['discordcalendarbot'],
+    version='1.0.1',
     description='Discord bot that handle a Google calendar',
     long_description=long_description,
     author='Axel Rieben & Johnny Da Costa',
